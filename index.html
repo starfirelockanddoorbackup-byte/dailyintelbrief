@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matthews Operations Lab | Daily Strategic Intel</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #090b0e;
+      --card-bg: #11151c;
+      --card-border: #1e2633;
+      --accent: #2e69ff;
+      --accent-alert: #ff3b30;
+      --accent-warn: #ff9500;
+      --text: #e1e7ec;
+      --text-muted: #798799;
+      --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: var(--bg); color: var(--text); font-family: var(--font-sans); line-height: 1.5; padding: 12px; }
+    
+    /* Weather Strip: Single clean horizontal bar */
+    .weather-bar {
+      background: #0d1117;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      padding: 6px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #9eb1c7;
+      text-align: center;
+      margin-bottom: 12px;
+      white-space: nowrap;
+      overflow-x: auto;
+    }
+    
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--card-border);
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    .org-title { font-family: var(--font-mono); font-size: 1.1rem; font-weight: 700; letter-spacing: 1px; color: var(--accent); }
+    .status-badge { font-family: var(--font-mono); font-size: 0.75rem; background: #1a2333; color: #64b5f6; padding: 3px 8px; border-radius: 3px; border: 1px solid #2b3b55; }
+
+    /* Tabs */
+    .tab-bar { display: flex; gap: 4px; border-bottom: 1px solid var(--card-border); margin-bottom: 15px; overflow-x: auto; }
+    .tab-btn {
+      background: none; border: none; padding: 8px 16px; font-family: var(--font-mono); font-size: 0.8rem;
+      color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; text-transform: uppercase;
+    }
+    .tab-btn.active { color: #fff; border-bottom-color: var(--accent); background: #131922; }
+
+    /* Tab Content */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Metrics Grid */
+    .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 15px; }
+    .metric-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 4px; padding: 12px; }
+    .metric-title { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+    .metric-value { font-family: var(--font-mono); font-size: 1.4rem; font-weight: 700; margin: 4px 0; color: #fff; }
+    .metric-sub { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* Telemetry Text & Grid */
+    .content-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 4px; padding: 16px; margin-bottom: 15px; }
+    .box-title { font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent); margin-bottom: 10px; text-transform: uppercase; }
+    ul.brief-list { list-style: none; }
+    ul.brief-list li { margin-bottom: 12px; font-size: 0.9rem; border-left: 2px solid var(--card-border); padding-left: 10px; }
+    ul.brief-list li strong { color: #fff; }
+    a.source-link { color: var(--accent); text-decoration: none; font-family: var(--font-mono); font-size: 0.75rem; display: inline-block; margin-top: 4px; }
+    a.source-link:hover { text-decoration: underline; }
+
+    /* Chart Containers */
+    .chart-container { position: relative; height: 260px; width: 100%; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- Weather Indicator Bar -->
+  <div class="weather-bar" id="weather-strip">
+    Today (Oct 29): ☀️/🌧️ High 86°F / Low 74°F | Tomorrow (Oct 30): ☀️ High 85°F / Low 74°F | Saturday (Oct 31): ⛈️ High 83°F / Low 75°F
+  </div>
+
+  <header>
+    <div>
+      <div class="org-title">MATTHEWS OPERATIONS LAB</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted);" id="timestamp">October 29, 2026 // 06:30 EST</div>
+    </div>
+    <span class="status-badge">TELEMETRY FEED // UNRESTRICTED</span>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab(0)">Conflict & Attrition</button>
+    <button class="tab-btn" onclick="switchTab(1)">Energy & Logistics</button>
+    <button class="tab-btn" onclick="switchTab(2)">Financial Reset</button>
+    <button class="tab-btn" onclick="switchTab(3)">Cyber & Tech</button>
+    <button class="tab-btn" onclick="switchTab(4)">Humanitarian & Animal</button>
+  </div>
+
+  <!-- TAB 1: CONFLICT & ATTRITION -->
+  <div class="tab-panel active">
+    <div class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-title">Est. Combined Daily Fatalities</div>
+        <div class="metric-value" style="color: var(--accent-alert);">~135 / Day</div>
+        <div class="metric-sub">Active Theaters (Ukraine, Levant, Sudan)</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">WWII Mortality Equivalence Scale</div>
+        <div class="metric-value">0.012%</div>
+        <div class="metric-sub">Indexed vs 27,500/day peak industrial war</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">Base Independence Mandate</div>
+        <div class="metric-value" style="color: var(--accent-warn);">90 Days</div>
+        <div class="metric-sub">Pentagon FORTRESS Initiative Status</div>
+      </div>
+    </div>
+
+    <div class="content-box">
+      <div class="box-title">Kinetic Telemetry & Strategic Chessboard</div>
+      <ul class="brief-list">
+        <li>
+          <strong>Pentagon Base Disconnection Memos:</strong> Formal rollout of the FORTRESS initiative mandates military installations achieve 90-day off-grid water, micro-nuclear power, and ammunition reserves, severing dependence on vulnerable civilian power grids and logistics.
+          <br><a class="source-link" href="https://www.foxnews.com/politics/inside-pentagons-doomsday-plan-keep-america-fighting-global-war-erupts" target="_blank"></a>
+        </li>
+        <li>
+          <strong>Middle East Strategic Realignment:</strong> Analysis of regional operations aligns with systemic structural shifts across the Levant. Friction remains focused on chokepoint security and regional balance of power.
+          <br><a class="source-link" href="https://reliefweb.int/report/world/ai-model-warns-deadliest-conflict-zones-2026" target="_blank"></a>
+        </li>
+      </ul>
+      <div class="chart-container">
+        <canvas id="conflictChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: ENERGY, SUPPLY CHAIN & DOMESTIC LOGISTICS -->
+  <div class="tab-panel">
+    <div class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-title">Gulf Coast Diesel Crack Spread</div>
+        <div class="metric-value" style="color: var(--accent-warn);">$107.90 / bbl</div>
+        <div class="metric-sub">Extreme refining bottleneck margin</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">National Diesel Pump Avg</div>
+        <div class="metric-value">$4.65 / gal</div>
+        <div class="metric-sub">Commercial freight PPI +17.2% Y/Y</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">Power Grid Reserve Margin</div>
+        <div class="metric-value" style="color: var(--accent-alert);">CRITICAL</div>
+        <div class="metric-sub">Section 202(c) Emergency Orders active</div>
+      </div>
+    </div>
+
+    <div class="content-box">
+      <div class="box-title">Domestic Logistics & Infrastructure Pressure</div>
+      <ul class="brief-list">
+        <li>
+          <strong>Refining Spread Compression:</strong> Crack spreads hovering above $100/bbl maintain severe cost inflation on long-haul freight and commercial agricultural distribution, signaling severe localized supply rationing risks.
+          <br><a class="source-link" href="https://www.americanactionforum.org/insight/u-s-diesel-prices-hit-record-high-factors-and-implications/" target="_blank"></a>
+        </li>
+        <li>
+          <strong>Grid Inelasticity Interventions:</strong> Continued dispatch mandates for baseline fossil units reflect systemic delays in grid redundancy and transmission capacity.
+        </li>
+      </ul>
+      <div class="chart-container">
+        <canvas id="energyChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: FINANCIAL RESET & DE-DOLLARIZATION -->
+  <div class="tab-panel">
+    <div class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-title">Q2 Central Bank Gold Inflows</div>
+        <div class="metric-value" style="color: #ffd700;">289 Tonnes</div>
+        <div class="metric-sub">All-time record quarterly acquisition</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">USD Share of Global Reserves</div>
+        <div class="metric-value">56.7%</div>
+        <div class="metric-sub">Down from >72% (IMF COFER Data)</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">BRICS Sovereign Gold Stash</div>
+        <div class="metric-value">>6,000 Tonnes</div>
+        <div class="metric-sub">~21% of worldwide central reserves</div>
+      </div>
+    </div>
+
+    <div class="content-box">
+      <div class="box-title">Macro Balance Sheet Telemetry</div>
+      <ul class="brief-list">
+        <li>
+          <strong>De-Dollarization Velocity:</strong> Central banks continue a multi-year pace of over 850–1,000 tonnes of physical gold accumulation annually, moving custody out of Western clearinghouses to build commodity-backed non-dollar settlement rails.
+          <br><a class="source-link" href="https://goldsilver.com/industry-news/article/why-central-banks-buying-gold-2026/" target="_blank"></a>
+        </li>
+      </ul>
+      <div class="chart-container">
+        <canvas id="financeChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: CYBER, TECH & LEGISLATIVE -->
+  <div class="tab-panel">
+    <div class="content-box">
+      <div class="box-title">Asymmetric Cyber & Emerging Compute Readiness</div>
+      <ul class="brief-list">
+        <li>
+          <strong>Space-Based AI Compute (Project Suncatcher):</strong> Validation of orbital TPUs powered by continuous solar generation bypasses ground-station power grid dependencies.
+          <br><a class="source-link" href="https://blog.google/innovation-and-ai/models-and-research/google-research/google-project-suncatcher-facts/" target="_blank"></a>
+        </li>
+        <li>
+          <strong>Cyber-Infrastructure Threat Matrix:</strong> Backbone fiber-optic telemetry stable, but communications security directives focus on edge-processing resilience to resist satellite link degradation during regional electronic warfare events.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TAB 5: HUMANITARIAN & ANIMAL WELFARE -->
+  <div class="tab-panel">
+    <div class="content-box">
+      <div class="box-title">Communities in Need & Systemic Relief Gaps</div>
+      <ul class="brief-list">
+        <li>
+          <strong>Agricultural Input Deficits:</strong> Fuel and fertilizer pricing continues to threaten crop yields across vulnerable global breadbaskets.
+        </li>
+        <li>
+          <strong>Frontline Animal Welfare:</strong> Animal rescue networks in frontline conflict zones report acute feed supply shortages as commercial shipping corridors close.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(index) {
+      const tabs = document.querySelectorAll('.tab-btn');
+      const panels = document.querySelectorAll('.tab-panel');
+      tabs.forEach((t, i) => t.classList.toggle('active', i === index));
+      panels.forEach((p, i) => p.classList.toggle('active', i === index));
+    }
+
+    // Chart.js Theme Configurations
+    const chartDefaults = {
+      color: '#798799',
+      borderColor: '#1e2633',
+      font: { family: 'JetBrains Mono' }
+    };
+    Chart.defaults.color = chartDefaults.color;
+    Chart.defaults.borderColor = chartDefaults.borderColor;
+
+    // Conflict Chart
+    new Chart(document.getElementById('conflictChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Ukraine Theater', 'Middle East / Levant', 'Sudan / Horn of Africa', 'Other Conflicts'],
+        datasets: [{
+          label: 'Est. Daily Casualties (Attrition)',
+          data: [85, 25, 20, 5],
+          backgroundColor: '#ff3b30'
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // Energy Chart
+    new Chart(document.getElementById('energyChart'), {
+      type: 'line',
+      data: {
+        labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+        datasets: [{
+          label: 'Diesel Crack Spread ($/bbl)',
+          data: [42.10, 58.40, 71.20, 89.50, 107.90, 102.50],
+          borderColor: '#ff9500',
+          tension: 0.3
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // Finance Chart
+    new Chart(document.getElementById('financeChart'), {
+      type: 'line',
+      data: {
+        labels: ['2021', '2022', '2023', '2024', '2025', '2026'],
+        datasets: [{
+          label: 'Global Central Bank Gold Purchases (Tonnes)',
+          data: [473, 1082, 1037, 1045, 980, 850],
+          borderColor: '#ffd700',
+          tension: 0.2
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  </script>
+</body>
+</html>
