@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <title>Matthews Operations Lab | Daily Strategic Intel</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --card-bg: #131922;
+      --card-border: #1e293b;
+      --accent: #38bdf8;
+      --accent-alert: #f43f5e;
+      --accent-warn: #fbbf24;
+      --accent-hope: #34d399;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: var(--bg); color: var(--text); font-family: var(--font-sans); line-height: 1.6; padding: 16px; max-width: 1200px; margin: 0 auto; -webkit-font-smoothing: antialiased; }
+    
+    /* DEFCON Emergency Alert Banner (Controlled dynamically by script / set to block if active) */
+    .defcon-emergency-banner {
+      display: none; 
+      background: rgba(244, 63, 94, 0.2);
+      border: 2px solid var(--accent-alert);
+      border-radius: 6px;
+      padding: 12px 18px;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: #ffe4e6;
+      margin-bottom: 16px;
+      animation: pulse-alert 2s infinite;
+    }
+    .defcon-badge { background: var(--accent-alert); color: #fff; padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.72rem; text-transform: uppercase; margin-right: 8px; }
+    @keyframes pulse-alert { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+    /* Weather Bar */
+    .weather-bar {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 16px;
+      white-space: nowrap;
+      overflow-x: auto;
+    }
+    
+    /* Smoke-Screen Diversion Alert Banner */
+    .smoke-screen-banner {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid var(--accent-alert);
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: #fda4af;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .smoke-badge { background: var(--accent-alert); color: #fff; padding: 2px 6px; border-radius: 3px; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 14px;
+      margin-bottom: 20px;
+    }
+    .org-title { font-family: var(--font-mono); font-size: 1.15rem; font-weight: 700; letter-spacing: 0.05em; color: var(--accent); }
+    .status-badge { font-family: var(--font-mono); font-size: 0.72rem; background: #0f172a; color: var(--accent); padding: 4px 10px; border-radius: 4px; border: 1px solid #1e293b; }
+
+    /* Tabs */
+    .tab-bar { display: flex; gap: 6px; border-bottom: 1px solid var(--card-border); margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; }
+    .tab-btn {
+      background: none; border: none; padding: 10px 14px; font-family: var(--font-mono); font-size: 0.76rem; font-weight: 500;
+      color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; text-transform: uppercase; letter-spacing: 0.03em;
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: #131922; border-radius: 4px 4px 0 0; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Content Cards */
+    .content-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2); }
+    .box-title { font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; color: var(--accent); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--card-border); padding-bottom: 8px; }
+    
+    ul.brief-list { list-style: none; }
+    ul.brief-list > li { margin-bottom: 20px; font-size: 0.92rem; border-left: 2px solid var(--accent); padding-left: 14px; color: #cbd5e1; }
+    ul.brief-list > li strong { color: var(--text); font-weight: 600; }
+    
+    ul.sub-list { list-style: disc; margin-top: 8px; margin-left: 18px; color: var(--text-muted); }
+    ul.sub-list li { margin-bottom: 6px; font-size: 0.88rem; }
+    ul.sub-list li strong { color: #e2e8f0; }
+
+    .sentiment-note {
+      font-family: var(--font-sans);
+      font-style: italic;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      background: rgba(56, 189, 248, 0.03);
+      border-left: 2px dashed var(--accent-warn);
+      padding: 6px 10px;
+      margin-top: 8px;
+      border-radius: 0 4px 4px 0;
+    }
+    
+    .source-list { list-style: none; margin-top: 14px; border-top: 1px dashed var(--card-border); padding-top: 12px; }
+    .source-list li { font-size: 0.82rem; margin-bottom: 8px; border-left: none; padding-left: 0; }
+    a.source-link { color: var(--accent); text-decoration: none; font-family: var(--font-mono); font-size: 0.78rem; }
+    a.source-link:hover { text-decoration: underline; }
+
+    /* Metrics Grid */
+    .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .metric-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; padding: 16px; }
+    .metric-title { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .metric-value { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; margin: 6px 0; color: var(--text); letter-spacing: -0.02em; }
+    .metric-sub { font-size: 0.78rem; color: var(--text-muted); }
+    .chart-container { position: relative; height: 280px; width: 100%; margin-top: 15px; }
+  </style>
+</head>
+<body>
+
+  <!-- DEFCON Emergency Alert Banner -->
+  <div class="defcon-emergency-banner" id="defcon-banner">
+    <span class="defcon-badge">CRITICAL ALERT</span>
+    <span id="defcon-message">SYSTEM NOTICE: Major existential escalation detected. Monitoring active conflict threshold parameters.</span>
+  </div>
+
+  <!-- Weather Indicator Bar -->
+  <div class="weather-bar" id="weather-strip">
+    Today (Oct 29): ☀️/🌧️ High 86°F / Low 74°F | Tomorrow (Oct 30): ☀️ High 85°F / Low 74°F | Saturday (Oct 31): ⛈️ High 83°F / Low 75°F
+  </div>
+
+  <!-- Narrative Smoke-Screen Detector Alert Banner -->
+  <div class="smoke-screen-banner" id="smoke-screen-alert">
+    <span class="smoke-badge">Smoke-Screen Alert</span>
+    <span id="smoke-text">Media saturation index high on secondary cultural narrative; check underlying legislative committee filings.</span>
+  </div>
+
+  <header>
+    <div>
+      <div class="org-title">MATTHEWS OPERATIONS LAB</div>
+      <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;" id="timestamp">October 29, 2026 // 06:30 EST</div>
+    </div>
+    <span class="status-badge">APEX-HUD // UNRESTRICTED</span>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab(0)">Daily Intel Brief</button>
+    <button class="tab-btn" onclick="switchTab(1)">Conflict</button>
+    <button class="tab-btn" onclick="switchTab(2)">Energy & Logistics</button>
+    <button class="tab-btn" onclick="switchTab(3)">Financial & Insider</button>
+    <button class="tab-btn" onclick="switchTab(4)">Cyber & Tech</button>
+    <button class="tab-btn" onclick="switchTab(5)">Humanitarian</button>
+    <button class="tab-btn" onclick="switchTab(6)" style="color: var(--accent-hope);">Hope & Progress</button>
+  </div>
+
+  <!-- TAB 0: MASTER CONCISE BRIEFING (HOMEPAGE) -->
+  <div class="tab-panel active">
+    <div class="content-box" style="border-color: var(--accent);">
+      <div class="box-title" style="color: #f8fafc; font-size: 1rem;">DAILY STRATEGIC INTELLIGENCE BRIEFING (MASTER TELEMETRY CONSOLE)</div>
+      <div style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted); margin-bottom: 16px;">
+        Date: October 29, 2026 | Time: 06:30 EST | Classification: Unrestricted Tactical & Economic Intelligence Feed
+      </div>
+      <ul class="brief-list">
+        <li>
+          <strong>GEOPOLITICAL CONFLICTS & WAR ATTRITION:</strong> Pentagon’s <strong>FORTRESS Initiative</strong> mandates major military installations achieve 90-day self-sufficiency independent of municipal infrastructure.
+          <div class="sentiment-note">★ Note: Official wire reports claim seamless base integration timelines, but logistics contractors report acute supply shortages on backup parts.</div>
+        </li>
+        <li><strong>SUPPLY CHAIN & ENERGY:</strong> Diesel crack spreads remain elevated near $107/bbl, constraining freight transport across primary transit corridors.</li>
+        <li><strong>EMERGING TECH & SPACE:</strong> Orbital compute initiatives (Project Suncatcher TPU arrays in LEO) redefine edge resilience by bypassing ground-based grid failure points.</li>
+        <li><strong>LEGISLATIVE & FINANCIAL RESET:</strong> Sovereign gold accumulation by BRICS+ nations continues at record velocity as a hedge against fiat volatility.</li>
+        <li><strong>HOPE & CIVILIZATIONAL TRAJECTORY:</strong> Despite localized shocks, multi-century metrics confirm structural global declines in homicide rates and centuries-long progress in baseline health and literacy.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TAB 1: CONFLICT -->
+  <div class="tab-panel">
+    <div class="metrics-row">
+      <div class="metric-card"><div class="metric-title">Est. Daily Fatalities</div><div class="metric-value" style="color: var(--accent-alert);">~135 / Day</div><div class="metric-sub">Active Theaters</div></div>
+      <div class="metric-card"><div class="metric-title">WWII Mortality Scale</div><div class="metric-value">0.012%</div><div class="metric-sub">Indexed vs peak industrial war</div></div>
+      <div class="metric-card"><div class="metric-title">Base Mandate</div><div class="metric-value" style="color: var(--accent-warn);">90 Days</div><div class="metric-sub">FORTRESS Status</div></div>
+    </div>
+    <div class="content-box">
+      <div class="box-title">Conflict Attrition Analytics</div>
+      <div class="chart-container"><canvas id="conflictChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- TAB 2: ENERGY & LOGISTICS -->
+  <div class="tab-panel">
+    <div class="metrics-row">
+      <div class="metric-card"><div class="metric-title">Diesel Crack Spread</div><div class="metric-value" style="color: var(--accent-warn);">$107.90 / bbl</div><div class="metric-sub">Refining margin bottleneck</div></div>
+      <div class="metric-card"><div class="metric-title">National Diesel Avg</div><div class="metric-value">$4.65 / gal</div><div class="metric-sub">Commercial freight PPI Y/Y</div></div>
+      <div class="metric-card"><div class="metric-title">Grid Reserve Margin</div><div class="metric-value" style="color: var(--accent-alert);">CRITICAL</div><div class="metric-sub">Section 202(c) Orders active</div></div>
+    </div>
+    <div class="content-box">
+      <div class="box-title">Energy Infrastructure Spreads</div>
+      <div class="chart-container"><canvas id="energyChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- TAB 3: FINANCIAL & INSIDER -->
+  <div class="tab-panel">
+    <div class="metrics-row">
+      <div class="metric-card"><div class="metric-title">Insider Flow Index</div><div class="metric-value" style="color: var(--accent-alert);">ELEVATED</div><div class="metric-sub">Unusual options sweeps</div></div>
+      <div class="metric-card"><div class="metric-title">Central Bank Gold</div><div class="metric-value" style="color: #fbbf24;">289 Tonnes</div><div class="metric-sub">Quarterly acquisition</div></div>
+      <div class="metric-card"><div class="metric-title">BRICS Gold Stash</div><div class="metric-value">>6,000 Tonnes</div><div class="metric-sub">Sovereign reserves</div></div>
+    </div>
+    <div class="content-box">
+      <div class="box-title">Sovereign Reserves & Pre-Announcement Flow</div>
+      <div class="chart-container"><canvas id="financeChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- TAB 4: CYBER & TECH -->
+  <div class="tab-panel"><div class="content-box"><div class="box-title">Asymmetric Cyber & Edge Compute</div><ul class="brief-list"><li><strong>Project Suncatcher:</strong> Orbital TPU arrays validate uninterrupted solar-powered intelligence nodes.</li></ul></div></div>
+
+  <!-- TAB 5: HUMANITARIAN -->
+  <div class="tab-panel"><div class="content-box"><div class="box-title">Frontline Welfare & Agricultural Inputs</div><ul class="brief-list"><li><strong>Input Deficits:</strong> Fertilizer pricing pressures impacting regional breadbasket yields.</li></ul></div></div>
+
+  <!-- TAB 6: HOPE & LONG-TERM PROGRESS -->
+  <div class="tab-panel">
+    <div class="metrics-row">
+      <div class="metric-card"><div class="metric-title">Long-Term Homicide Trend</div><div class="metric-value" style="color: var(--accent-hope);">DOWNWARD</div><div class="metric-sub">Secular multi-century decline</div></div>
+      <div class="metric-card"><div class="metric-title">Housing Affordability Index</div><div class="metric-value" style="color: var(--accent-warn);">STRAINED</div><div class="metric-sub">Recent post-pandemic dip</div></div>
+      <div class="metric-card"><div class="metric-title">Global Literacy Rate</div><div class="metric-value" style="color: var(--accent-hope);">~87%</div><div class="metric-sub">Historic multi-decade highs</div></div>
+    </div>
+    <div class="content-box" style="border-color: var(--accent-hope);">
+      <div class="box-title" style="color: var(--accent-hope);">Civilizational Progress & Multi-Century Trajectory</div>
+      <div class="chart-container">
+        <canvas id="hopeChart"></canvas>
+      </div>
+      <ul class="brief-list" style="margin-top: 15px;">
+        <li>
+          <strong>The Arc of Historical Improvement:</strong> Long-term empirical data confirms that humanity continues to trend upward across generations—driven by compounding medical advancements, lower baseline global violence over centuries, and unprecedented technological literacy.
+          <div class="sentiment-note">★ Note: Public perception indexes consistently skew toward doom due to negativity bias, masking massive multi-decade gains in child survival and health.</div>
+        </li>
+      </ul>
+      <ul class="source-list">
+        <li>🔗 <strong>Human Progress Bulletin:</strong> <a class="source-link" href="https://humanprogress.org" target="_blank">Global Homicide Rates and Long-Term Institutional Improvements Update</a></li>
+        <li>🔗 <strong>Medical Breakthrough Wire:</strong> <a class="source-link" href="https://www.who.int" target="_blank">Global Health Access Milestones and Scaled Treatment Access Reports</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(index) {
+      const tabs = document.querySelectorAll('.tab-btn');
+      const panels = document.querySelectorAll('.tab-panel');
+      tabs.forEach((t, i) => t.classList.toggle('active', i === index));
+      panels.forEach((p, i) => p.classList.toggle('active', i === index));
+    }
+
+    const chartDefaults = { color: '#94a3b8', borderColor: '#1e293b', font: { family: 'JetBrains Mono' } };
+    Chart.defaults.color = chartDefaults.color;
+    Chart.defaults.borderColor = chartDefaults.borderColor;
+
+    new Chart(document.getElementById('conflictChart'), {
+      type: 'bar', data: { labels: ['Ukraine', 'Levant', 'Sudan', 'Other'], datasets: [{ label: 'Daily Attrition', data: [85, 25, 20, 5], backgroundColor: '#f43f5e' }] }, options: { responsive: true, maintainAspectRatio: false }
+    });
+    new Chart(document.getElementById('energyChart'), {
+      type: 'line', data: { labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'], datasets: [{ label: 'Crack Spread', data: [42, 58, 71, 89, 107, 102], borderColor: '#fbbf24', tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false }
+    });
+    new Chart(document.getElementById('financeChart'), {
+      type: 'line', data: { labels: ['2021', '2022', '2023', '2024', '2025', '2026'], datasets: [{ label: 'Gold (Tonnes)', data: [473, 1082, 1037, 1045, 980, 850], borderColor: '#fbbf24', tension: 0.2 }] }, options: { responsive: true, maintainAspectRatio: false }
+    });
+    new Chart(document.getElementById('hopeChart'), {
+      type: 'line',
+      data: {
+        labels: ['1820', '1900', '1950', '1980', '2000', '2026'],
+        datasets: [
+          { label: 'Global Literacy Rate (%)', data: [12, 20, 42, 70, 82, 87], borderColor: '#34d399', tension: 0.3 },
+          { label: 'Housing Affordability Index (Normalized)', data: [90, 85, 88, 82, 75, 58], borderColor: '#fbbf24', tension: 0.3 }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  </script>
+</body>
+</html>
