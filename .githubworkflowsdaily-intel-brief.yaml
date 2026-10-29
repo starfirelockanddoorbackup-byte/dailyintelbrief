@@ -1,0 +1,39 @@
+name: Autonomous AI Strategic Intel Briefing
+
+on:
+  schedule:
+    - cron: '30 10 * * *' # 06:30 EST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install requests google-genai
+
+      - name: Run Autonomous Brief Generator
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python generate_brief.py
+
+      - name: Commit and Push Fresh Briefing
+        run: |
+          git config --local user.email "operations@matthewsopslab.internal"
+          git config --local user.name "Matthews Operations Lab AI Agent"
+          git add index.html
+          git commit -m "Autonomous Intel Update: $(date -u +'%Y-%m-%d')" || echo "No changes"
+          git push
