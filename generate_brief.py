@@ -1,4 +1,5 @@
-import os
+import os 
+import time
 import re
 from datetime import datetime
 import requests
@@ -31,22 +32,37 @@ def get_cooper_city_weather():
 
 def generate_ai_brief():
     client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
-    
-    prompt = """
-    Act as the chief intelligence officer for Matthews Operations Lab. Write the daily strategic intelligence brief for today.
-    Incorporate the following advanced telemetry angles naturally:
-    1. Scan for pre-announcement market anomalies or unusual sector positioning that hint at undeclared policy or trade shifts.
-    2. Evaluate mainstream media sentiment for narrative diversion ("smoke screens" or sudden saturation on secondary cultural events covering up major policy/conflict shifts).
-    3. Include occasional ground-truth sentiment discrepancy notes where message boards and forum operators contradict official wire reports.
 
-    Return ONLY clean HTML list items (<li>...</li>) matching the styling format of the dashboard, containing the detailed breakdown across the 5 core categories, including <div class="sentiment-note">★ Note: ...</div> where a ground-truth divergence exists.
-    """
-    
-    response = client.models.generate_content(
-        model='gemini-3.8-flash',
-        contents=prompt,
-    )
-    return response.text
+    prompt = """
+Act as the chief intelligence officer for Matthews Operations Lab. Write the daily strategic intelligence brief for today.
+Incorporate the following advanced telemetry angles naturally:
+1. Scan for pre-announcement market anomalies or unusual sector positioning that hint at undeclared policy or trade shifts.
+2. Evaluate mainstream media sentiment for narrative diversion ("smoke screens" or sudden saturation on secondary cultural events covering up major policy/conflict shifts).
+3. Include occasional ground-truth sentiment discrepancy notes where message boards and forum operators contradict official wire reports.
+
+Return ONLY clean HTML list items (<li>...</li>) matching the styling format of the dashboard, containing the detailed breakdown across the 5 core categories, including <div class="sentiment-tag">...</div> styling.
+"""
+
+    models_to_try = ['gemini-3.8-flash', 'gemini-3.8-pro']
+
+    for model_name in models_to_try:
+        for attempt in range(1, 4):
+            try:
+                print(f"Calling {model_name} (Attempt {attempt}/3)...")
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                )
+                if response and response.text:
+                    return response.text
+            except Exception as e:
+                print(f"Attempt {attempt} failed on {model_name}: {e}")
+                if attempt < 3:
+                    time.sleep(5 * attempt)
+                else:
+                    print(f"Switching from {model_name} due to repeated errors.")
+
+    raise RuntimeError("All models and retry attempts exhausted due to high demand.")
 
 def update_dashboard():
     weather_strip = get_cooper_city_weather()
