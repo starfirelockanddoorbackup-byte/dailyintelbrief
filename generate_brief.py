@@ -43,7 +43,7 @@ Incorporate the following advanced telemetry angles naturally:
 Return ONLY clean HTML list items (<li>...</li>) matching the styling format of the dashboard, containing the detailed breakdown across the 5 core categories, including <div class="sentiment-tag">...</div> styling.
 """
 
-    models_to_try = ['gemini-3.8-flash', 'gemini-3.8-pro']
+    models_to_try = ['gemini-3.8-flash', 'gemini-3.1-pro-preview']
 
     for model_name in models_to_try:
         for attempt in range(1, 4):
