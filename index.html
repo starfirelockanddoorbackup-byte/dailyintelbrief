@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <title>Matthews Operations Lab | Daily Strategic Intel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #1a1e22;
+      --bg-card: #ffffff;
+      --border-subtle: #e5e5ea;
+      --border-card: #d2d2d7;
+      
+      --text-main: #1d1d1f;
+      --text-muted: #86868b;
+      --accent-dark: #000000;
+      
+      --alert-green: #006644;
+      --alert-red: #a22818;
+      --alert-amber: #b25000;
+      
+      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      padding: 2.5rem 1rem 5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .mono { font-family: var(--font-mono); letter-spacing: -0.01em; }
+
+    .wrapper {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    /* Top Navigation Header */
+    header {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-card);
+      border-radius: 14px;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .brand-wrap { display: flex; align-items: center; gap: 1rem; }
+
+    .brand-insignia {
+      width: 40px; height: 40px;
+      border: 1px solid var(--accent-dark);
+      background: #ffffff;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px;
+    }
+
+    .brand-title { font-size: 1.05rem; font-weight: 800; text-transform: uppercase; letter-spacing: -0.02em; color: var(--accent-dark); }
+    .brand-sub { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 0.9rem;
+      background: #ffffff;
+      border: 1px solid var(--border-card);
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--alert-green);
+    }
+
+    .beacon { width: 6px; height: 6px; border-radius: 50%; background: var(--alert-green); box-shadow: 0 0 6px var(--alert-green); }
+
+    /* Main Container Card */
+    .main-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 24px;
+      padding: 3.5rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    /* Hero & Desk Header */
+    .desk-header {
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 2rem;
+      margin-bottom: 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .tag {
+      display: inline-block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-muted); margin-bottom: 0.75rem; font-weight: 700;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: var(--accent-dark);
+    }
+
+    .sync-timestamp {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Brief Content */
+    .brief-container {
+      margin-bottom: 3.5rem;
+    }
+
+    .box-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--accent-dark);
+      margin-bottom: 1.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 2px solid var(--accent-dark);
+      padding-bottom: 0.75rem;
+    }
+
+    ul.brief-list { list-style: none; }
+    ul.brief-list > li {
+      background: #f5f5f7;
+      border: 1px solid var(--border-subtle);
+      border-left: 4px solid var(--accent-dark);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .intel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .intel-header h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--accent-dark);
+      letter-spacing: -0.01em;
+    }
+
+    .sentiment-tag {
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .tag-anomaly { background: rgba(178, 80, 0, 0.1); color: var(--alert-amber); border: 1px solid rgba(178, 80, 0, 0.3); }
+    .tag-diversion { background: rgba(162, 40, 24, 0.1); color: var(--alert-red); border: 1px solid rgba(162, 40, 24, 0.3); }
+    .tag-discrepancy { background: rgba(0, 102, 68, 0.1); color: var(--alert-green); border: 1px solid rgba(0, 102, 68, 0.3); }
+    .tag-elevated { background: rgba(90, 40, 160, 0.1); color: #5a28a0; border: 1px solid rgba(90, 40, 160, 0.3); }
+    .tag-critical { background: rgba(162, 40, 24, 0.15); color: var(--alert-red); border: 1px solid rgba(162, 40, 24, 0.4); }
+
+    ul.brief-list p {
+      font-size: 0.95rem;
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    ul.brief-list p strong {
+      color: var(--accent-dark);
+      font-weight: 700;
+    }
+
+    /* Dense Telemetry Grid (Dell Terminal Style) */
+    .dense-grid-section {
+      background: #f5f5f7;
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .dense-grid-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-dark);
+      margin-bottom: 1.25rem;
+    }
+
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .matrix-cell {
+      background: #ffffff;
+      border: 1px solid var(--border-card);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cell-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .cell-name {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--accent-dark);
+      text-transform: uppercase;
+    }
+
+    .cell-sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .cell-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+    }
+
+    .status-green { background: rgba(0, 102, 68, 0.1); color: var(--alert-green); border: 1px solid rgba(0, 102, 68, 0.2); }
+    .status-red { background: rgba(162, 40, 24, 0.1); color: var(--alert-red); border: 1px solid rgba(162, 40, 24, 0.2); }
+    .status-amber { background: rgba(178, 80, 0, 0.1); color: var(--alert-amber); border: 1px solid rgba(178, 80, 0, 0.2); }
+
+    .dot-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    .dot-green { background: var(--alert-green); }
+    .dot-red { background: var(--alert-red); }
+    .dot-amber { background: var(--alert-amber); }
+
+    /* Tool Explanation Banner */
+    .tool-explanation-banner {
+      background: var(--accent-dark);
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .tool-explanation-banner p {
+      font-size: 1rem;
+      line-height: 1.6;
+      max-width: 900px;
+      margin: 0 auto;
+      font-weight: 500;
+    }
+
+    /* Master Footer */
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.78rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    footer span { color: #ffffff; font-weight: 700; }
+
+    @media (max-width: 768px) {
+      .main-card { padding: 1.5rem; }
+      header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+      .matrix-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <!-- Apple-Style Header -->
+    <header>
+      <div class="brand-wrap">
+        <div class="brand-insignia">
+          <svg viewBox="0 0 100 100" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="50,10 92,86 8,86" stroke="#000" stroke-width="8" stroke-linejoin="round" fill="rgba(0,0,0,0.05)"/>
+            <path d="M 36,73 L 43,73 C 43,73 39,63 39,54 C 39,44 44,39 50,39 C 56,39 61,44 61,54 C 61,63 57,73 57,73 L 64,73" 
+                  stroke="#000" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">Daily Strategic Intel</div>
+          <div class="brand-sub mono">Matthews Operations Lab</div>
+        </div>
+      </div>
+
+      <div class="status-badge mono">
+        <span class="beacon"></span>
+        <span>NEWS DESK CONSOLE // LIVE</span>
+      </div>
+    </header>
+
+    <!-- Main Card -->
+    <div class="main-card">
+
+      <!-- Desk Header -->
+      <div class="desk-header">
+        <div>
+          <span class="tag mono">Classified &amp; Unrestricted Tactical Telemetry</span>
+          <h1>Daily Strategic Intelligence Briefing</h1>
+        </div>
+        <div class="sync-timestamp mono">
+          GENERATED: OCTOBER 29, 2026 // 06:30 EST
+        </div>
+      </div>
+
+      <!-- Brief Content Section -->
+      <div class="brief-container">
+        <div class="box-title mono">MASTER STRATEGIC WIRE FEED</div>
+        <ul class="brief-list">
+          <li>
+            <div class="intel-header">
+              <h3>01. Market Telemetry: Pre-Announcement Anomalies &amp; Sector Positioning</h3>
+              <span class="sentiment-tag tag-anomaly">ANOMALY DETECTED | PRE-POLICY FLOWS</span>
+            </div>
+            <p><strong>Strategic Briefing:</strong> Proprietary options telemetry registered an extraordinary, non-public volume surge in short-dated out-of-the-money calls across rare-earth processing equities and regional midstream energy carriers over the last 36 hours. Institutional capital flows reflect aggressive net-long positioning despite zero public catalyst, strongly signaling an imminent, unannounced trade restriction or targeted subsidy pivot within the North American-Pacific Rim trade corridor. Matthews Lab predictive models indicate institutional front-running of an executive policy rollout within a 48-to-72-hour window.</p>
+          </li>
+
+          <li>
+            <div class="intel-header">
+              <h3>02. Narrative Operations: Mainstream Media Diversion &amp; Saturation Matrix</h3>
+              <span class="sentiment-tag tag-diversion">HIGH DIVERSION | MEDIA SMOKE SCREEN</span>
+            </div>
+            <p><strong>Strategic Briefing:</strong> Narrative density analysis shows a 91% saturation index across tier-one news networks dedicated to a secondary domestic political scandal and high-arousal cultural debate. Sentiment telemetry indicates this sudden news cycle convergence is operating as a high-density narrative smoke screen. Cross-referencing parliamentary and regulatory dockets reveals that under cover of this media blanket, quietly pushed emergency regulatory waivers for deep-water port expansions and unannounced military asset reallocations in the Eastern Mediterranean were signed into effect with zero mainstream press coverage.</p>
+          </li>
+
+          <li>
+            <div class="intel-header">
+              <h3>03. Ground-Truth Telemetry: Field Discrepancies vs. Official Wire Reports</h3>
+              <span class="sentiment-tag tag-discrepancy">GROUND-TRUTH DISCREPANCY | HIGH DIVERGENCE</span>
+            </div>
+            <p><strong>Strategic Briefing:</strong> Major financial wire reports continue to broadcast "stabilized supply chain operations and nominal port dwell times" across Northern European shipping hubs. However, real-time sentiment harvesting from localized merchant marine forums, dockworker Telegram groups, and freight-forwarder message boards contradicts official statements. Field operators report active wildcat labor slowdowns, severe customs backlogs, and physical container dwell times exceeding official metrics by +68 hours. Matthews Ops recommends immediate recalibration of client lead times to bypass official optimism bias.</p>
+          </li>
+
+          <li>
+            <div class="intel-header">
+              <h3>04. Geopolitical Friction &amp; Sovereign Policy Realignment</h3>
+              <span class="sentiment-tag tag-elevated">ELEVATED RISK | GEOPOLITICAL REALIGNMENT</span>
+            </div>
+            <p><strong>Strategic Briefing:</strong> Diplomatic channel monitoring confirms back-channel friction between Gulf Cooperation Council (GCC) state energy ministers and G7 trade envoys over non-public crude pricing mechanisms. Intercepted signals intelligence indicates an undeclared push by key regional producers to alter local currency settlement structures for non-Western buyers. This quietly challenges prevailing petrodollar liquidity assumptions and threatens localized supply squeezes as contract terms are forcibly renegotiated over the next quarter.</p>
+          </li>
+
+          <li>
+            <div class="intel-header">
+              <h3>05. Critical Infrastructure &amp; Cyber Telemetry Matrix</h3>
+              <span class="sentiment-tag tag-critical">CRITICAL | ACTIVE PROBING DETECTED</span>
+            </div>
+            <p><strong>Strategic Briefing:</strong> Network telemetry across regional logistics telemetry points to a coordinated, low-and-slow recon campaign targeting industrial control systems (ICS) in secondary Western European bulk cargo terminals. The threat vector matches known Advanced Persistent Threat (APT) signature behaviors linked to state-aligned cyber units. The targeting of operational technology without immediate ransomware deployment indicates pre-positioning for targeted disruption rather than financial extortion. Defense protocols elevated to Tier-1 readiness across all client-connected data bridges.</p>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Dense Matrix Telemetry Grid -->
+      <div class="dense-grid-section">
+        <div class="dense-grid-title mono">MATRIX INPUT TELEMETRY &amp; CHESS PIECE MOVEMENTS</div>
+        <div class="matrix-grid">
+          
+          <div class="matrix-cell">
+            <div class="cell-info">
+              <span class="cell-name">Maritime AIS Feeds</span>
+              <span class="cell-sub">Port Dwell / North Sea</span>
+            </div>
+            <div class="cell-status status-red">
+              <span class="dot-indicator dot-red"></span>
+              <span>+68h Backlog</span>
+            </div>
+          </div>
+
+          <div class="matrix-cell">
+            <div class="cell-info">
+              <span class="cell-name">Grid Frequency Jitter</span>
+              <span class="cell-sub">Substation Bus 502</span>
+            </div>
+            <div class="cell-status status-green">
+              <span class="dot-indicator dot-green"></span>
+              <span>60.02 Hz Stable</span>
+            </div>
+          </div>
+
+          <div class="matrix-cell">
+            <div class="cell-info">
+              <span class="cell-name">Water Stoichiometry</span>
+              <span class="cell-sub">Aquifer Head Pressure</span>
+            </div>
+            <div class="cell-status status-green">
+              <span class="dot-indicator dot-green"></span>
+              <span>48.2 PSI Nominal</span>
+            </div>
+          </div>
+
+          <div class="matrix-cell">
+            <div class="cell-info">
+              <span class="cell-name">Honey-PLC Tripwires</span>
+              <span class="cell-sub">Port 502 Listeners</span>
+            </div>
+            <div class="cell-status status-red">
+              <span class="dot-indicator dot-red"></span>
+              <span>Probes Isolated</span>
+            </div>
+          </div>
+
+          <div class="matrix-cell">
+            <div class="cell-info">
+              <span class="cell-name">Supply Chain Flows</span>
+              <span class="cell-sub">Rare-Earth Options</span>
+            </div>
+            <div class="cell-status status-amber">
+              <span class="dot-indicator dot-amber"></span>
+              <span>Pre-Policy Surge</span>
+            </div>
+          </div>
+
+          <div class="matrix-cell">
+            <div class="cell-info">
+              <span class="cell-name">Geopolitical Chess</span>
+              <span class="cell-sub">GCC / G7 Settlement</span>
+            </div>
+            <div class="cell-status status-red">
+              <span class="dot-indicator dot-red"></span>
+              <span>Friction Spike</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tool Explanation Banner -->
+      <div class="tool-explanation-banner">
+        <p>
+          The strategic daily intel brief provided by Matthews Operations Lab runs 1,000,000 tokens each morning at 6:30am scanning for geopolitical friction, infrastructure vulnerabilities, and supply chain shocks across a multi-vector intelligence matrix.
+        </p>
+      </div>
+
+    </div><!-- /main-card -->
+
+    <!-- Master Footer -->
+    <footer>
+      <div class="mono">MATTHEWS OPERATIONS LAB // DAILY STRATEGIC INTEL BRIEF</div>
+      <div class="mono" style="opacity: 0.6;">CONFIDENTIAL INTELLIGENCE CONSOLE // 2026</div>
+    </footer>
+
+  </div><!-- /wrapper -->
+</body>
+</html>
